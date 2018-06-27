@@ -32,3 +32,17 @@ class RegisterForm(FlaskForm):
 class IdeaForm(FlaskForm):
     title = StringField('Title')
     description = StringField('Description', widget=TextArea())
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField(
+        'New Password',
+        validators=[DataRequired(), Length(min=6, max=25)]
+    )
+    confirm = PasswordField(
+        'Confirm password',
+        validators=[
+            DataRequired(),
+            EqualTo('password', message='Passwords must match.')
+        ]
+    )

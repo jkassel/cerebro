@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from project.server import bcrypt, db
 from project.server.models import User, Idea
-from project.server.user.forms import LoginForm, RegisterForm, IdeaForm
+from project.server.user.forms import LoginForm, RegisterForm, IdeaForm, ResetPasswordForm
 
 ################
 #### config ####
@@ -28,10 +28,14 @@ user_blueprint = Blueprint('user', __name__,)
 def register():
     form = RegisterForm(request.form)
     if form.validate_on_submit():
+
+        pw_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
         user = User(
             email=form.email.data,
-            password=form.password.data
+            password=pw_hash
         )
+
         db.session.add(user)
         db.session.commit()
 
@@ -48,6 +52,8 @@ def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+        print("checking password: " + str(request.form['password']))
+
         if user and bcrypt.check_password_hash(
                 user.password, request.form['password']):
             login_user(user)
@@ -122,5 +128,16 @@ def edit_idea(idea):
     form.description.data = idea_result.description
     return render_template('user/idea_edit.html', idea=idea_result, form=form)
 
+
+@user_blueprint.route('/resetpassword', methods=['GET', 'POST'])
+def reset_password():
+    form = ResetPasswordForm(request.form)
+    if form.validate_on_submit():
+        pw_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User.query.filter_by(id=current_user.id).first()
+        user.password = pw_hash
+        db.session.commit()
+        return redirect(url_for('main.home'))
+    return render_template('user/passwordreset.html', form=form)
 
 
