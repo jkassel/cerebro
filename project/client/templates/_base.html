@@ -11,6 +11,8 @@
     <!-- styles -->
     <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.1/yeti/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="{{url_for('static', filename='main.css')}}" rel="stylesheet" media="screen">
+      <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+      <link rel="icon" href={{ url_for('static', filename='favicon.ico') }} type="image/x-icon">
     {% block css %}{% endblock %}
   </head>
 
