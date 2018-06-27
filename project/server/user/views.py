@@ -29,11 +29,9 @@ def register():
     form = RegisterForm(request.form)
     if form.validate_on_submit():
 
-        pw_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-
         user = User(
             email=form.email.data,
-            password=pw_hash
+            password=form.password.data
         )
 
         db.session.add(user)
@@ -55,7 +53,7 @@ def login():
         print("checking password: " + str(request.form['password']))
 
         if user and bcrypt.check_password_hash(
-                user.password, request.form['password']):
+                user.password.encode('utf-8'), request.form['password'].encode('utf-8')):
             login_user(user)
             flash('You are logged in. Welcome!', 'success')
             return redirect(url_for('user.ideas'))
@@ -133,9 +131,8 @@ def edit_idea(idea):
 def reset_password():
     form = ResetPasswordForm(request.form)
     if form.validate_on_submit():
-        pw_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User.query.filter_by(id=current_user.id).first()
-        user.password = pw_hash
+        user.password = form.password.data
         db.session.commit()
         return redirect(url_for('main.home'))
     return render_template('user/passwordreset.html', form=form)

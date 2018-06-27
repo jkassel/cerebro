@@ -25,8 +25,13 @@ app = Flask(
     static_folder='../client/static'
 )
 
+if os.getenv('environment') == 'prod':
+    project_env = 'project.server.config.ProductionConfig'
+else:
+    project_env = 'project.server.config.DevelopmentConfig'
 
-app_settings = os.getenv('APP_SETTINGS', 'project.server.config.DevelopmentConfig')
+#app_settings = os.getenv('APP_SETTINGS', 'project.server.config.DevelopmentConfig')
+app_settings = project_env
 app.config.from_object(app_settings)
 
 
