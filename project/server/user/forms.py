@@ -5,7 +5,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 from wtforms.widgets import TextArea
-from flask_wysiwyg.wysiwyg import WysiwygField
 
 
 class LoginForm(FlaskForm):
