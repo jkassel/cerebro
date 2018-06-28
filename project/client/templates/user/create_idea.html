@@ -1,8 +1,22 @@
 {% extends "_base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
-    <h1>Add an Idea</h1>
+    <div class="container">
 
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li class="previous">
+                    <a class="btn btn-dark ml-auto" href="{{ url_for("user.ideas") }}">
+                        <i class="fa fa-arrow-left"></i> Go Back
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    <h1>Create Idea</h1>
+    <br><br>
+
+    </div>
     <form class="form" role="form" method="post" action="">
 
         {{ form.csrf_token }}
@@ -12,12 +26,18 @@
         <div class="col-lg-8 col-sm-8">
 
             {{ wtf.form_field(form.title, class="form-control") }}
-
+            <br><br>
             {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20", id="edit") }}
 
             <br><br>
 
-            <button class="btn btn-success" type="submit">Add Idea</button>
+           <!-- <button class="btn btn-success" type="submit">Add Idea</button> -->
+
+
+            <button class="btn btn-dark btn-lg" type="submit">
+                <i class="fa fa-plus-circle"></i> Create Idea
+            </button>
+
             <br><br>
         </div>
 

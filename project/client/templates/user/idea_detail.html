@@ -2,12 +2,34 @@
 
 {% block content %}
 
+    <div class="container">
+
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li class="previous">
+                    <a class="btn btn-dark ml-auto" href="{{ url_for("user.ideas") }}">
+                        <i class="fa fa-arrow-left"></i> Go Back
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    <br><br>
+
+
     <h1>Title</h1>
     <p>{{ idea.title }}</p>
+
+    <br><br>
 
     <h1>Description</h1>
     <p>{{ idea.description|safe }}</p>
 
-    <a href="{{ url_for('user.edit_idea', idea=idea.id) }}">edit</a>
+    <br><br>
 
+    <a class="btn btn-dark btn-lg ml-auto" href="{{ url_for('user.edit_idea', idea=idea.id) }}">
+        <i class="fa fa-pencil"></i> Edit
+    </a>
 {% endblock %}
+
+</div>

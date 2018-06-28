@@ -1,11 +1,18 @@
 {% extends "_base.html" %}
 
 {% block content %}
-    <h1>Ideas</h1>
-    <br>
-    <a href="{{ url_for('user.create_idea') }}">Add an Idea</a>
+    <div class="container">
+    <div class="row">
+        <h1>Ideas</h1>
 
-    <table class="table">
+        <a class="btn btn-dark btn-lg ml-auto" href="{{ url_for('user.create_idea') }}">
+            <i class="fa fa-plus-circle"></i> Add an Idea
+        </a>
+    </div>
+    <br>
+    <br>
+
+   <!-- <table class="table">
     <thead>
         <tr>
             <th>Idea No.</th>
@@ -13,15 +20,30 @@
             <th>Vote Count</th>
         </tr>
     </thead>
-    <tbody>
-    {% for idea in ideas %}
-    <tr>
-        <td>{{ idea.id }}</td>
-        <td><a href="{{ url_for('user.idea_detail', idea=idea.id) }}">{{ idea.title }}</a></td>
-        <!-- <td>{{ idea.description }}</td> -->
-        <td>{{ idea.vote_count }}</td>
-    </tr>
+    <tbody> -->
+    {% for idea_row in ideas | batch(2, '%nbsp;') %}
+    <!--<tr>
+        <td>{#  #}{ idea.id }}</td>
+        <td><a href="{#  #}{ url_for('user.idea_detail', idea=idea.id) }}">{#  #}{ idea.title }}</a></td>
+        <td>{#  #}{ idea.description }}</td>
+        <td>{#  #}{ idea.vote_count }}</td>
+    </tr> -->
+    <div class="row">
+        {% for idea in idea_row %}
+        <div class="col-sm-6">
+            <div class="card border-secondary mb-3" style="max-width: 28rem;">
+                <div class="card-body text-secondary">
+                    <h5 class="card-title">{{ idea.title }}</h5>
+                    <p class="card-text"></p>
+                    <a href={{ url_for('user.idea_detail', idea=idea.id) }} class="btn btn-dark">Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     {% endfor %}
-    </tbody>
-</table>
+    <!-- </tbody>
+</table> -->
 {% endblock %}
+
+</div>

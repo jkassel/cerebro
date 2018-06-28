@@ -1,13 +1,22 @@
 {% extends "_base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
-    <h1>Update Idea</h1>
+    <div class="container">
 
-    <nav aria-label="...">
-        <ul class="pager">
-            <li class="previous"><a href="{{ url_for("user.idea_detail",idea=idea.id) }}"><span aria-hidden="true">&larr;</span> Go Back</a></li>
-        </ul>
-    </nav>
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li class="previous">
+                    <a class="btn btn-dark ml-auto" href="{{ url_for("user.idea_detail",idea=idea.id) }}">
+                        <i class="fa fa-arrow-left"></i> Go Back
+                    </a>
+                </li>
+            </ul>
+            <!-- <a href="{#  #}{ url_for("user.idea_detail",idea=idea.id) }}"><span aria-hidden="true">&larr;</span> Go Back</a></li> -->
+        </nav>
+
+        <h1>Update Idea</h1>
+
+    </div>
 
     <form class="form" role="form" method="post" action="">
 
@@ -18,12 +27,16 @@
         <div class="col-lg-8 col-sm-8">
 
             {{ wtf.form_field(form.title, class="form-control") }}
+            <br><br>
             {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20", id="edit") }}
 
             <br><br>
 
-            <button class="btn btn-success" type="submit">Update Idea</button>
+            <!-- <button class="btn btn-success" type="submit">Update Idea</button> -->
 
+            <button class="btn btn-dark btn-lg" type="submit">
+                <i class="fa fa-check"></i> Update Idea
+            </button>
             <br><br>
         </div>
 
