@@ -51,10 +51,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         print("checking password: " + str(request.form['password']))
-        print("pw hash from db...")
-        print(user.password)
-        print("response form check password...")
-        print(bcrypt.check_password_hash(user.password.encode('utf-8'), request.form['password'].encode('utf-8')))
+        if user:
+            print("pw hash from db...")
+            print(user.password)
+            print("response form check password...")
+            print(bcrypt.check_password_hash(user.password.encode('utf-8'), request.form['password'].encode('utf-8')))
 
         if user and bcrypt.check_password_hash(
                 user.password.encode('utf-8'), request.form['password'].encode('utf-8')):
