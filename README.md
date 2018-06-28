@@ -1,8 +1,5 @@
-# Flask Skeleton
-
-Flask starter project...
-
-[![Build Status](https://travis-ci.org/realpython/flask-skeleton.svg?branch=master)](https://travis-ci.org/realpython/flask-skeleton)
+# Cerebro idea manager
+skeleton code based off flask-skeleton
 
 ## Quick Start
 
@@ -14,6 +11,13 @@ Flask starter project...
 ### Set Environment Variables
 
 Update *project/server/config.py*, and then run:
+
+Set environment to prod for ProductionConfig
+```sh
+$ export environment=prod
+```
+
+Below are no longer needed due to use of the 'environment' variable
 
 ```sh
 $ export APP_SETTINGS="project.server.config.DevelopmentConfig"
@@ -36,6 +40,8 @@ $ python manage.py create_data
 ```
 
 ### Run the Application
+
+Will take the port defined in the PORT env variable or set to 5000 by default with listening IP 0.0.0.0
 
 ```sh
 $ python manage.py runserver
