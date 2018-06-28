@@ -18,7 +18,9 @@
         <div class="col-lg-8 col-sm-8">
 
             {{ wtf.form_field(form.title, class="form-control") }}
-            {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20") }}
+            {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20", id="edit") }}
+
+            <br><br>
 
             <button class="btn btn-success" type="submit">Update Idea</button>
 
@@ -28,4 +30,14 @@
     </form>
 
 
+
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    <script>
+        $(function(){
+            $('#edit').froalaEditor({enter: $.FroalaEditor.ENTER_P, placeholderText: null})
+        });
+    </script>
 {% endblock %}

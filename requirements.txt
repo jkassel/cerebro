@@ -27,3 +27,6 @@ visitor
 Werkzeug
 WTForms
 psycopg2
+flask_ckeditor
+boto3
+Wand

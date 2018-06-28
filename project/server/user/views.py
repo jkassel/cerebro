@@ -4,25 +4,38 @@
 #################
 #### imports ####
 #################
-
+import os
 from flask import render_template, Blueprint, url_for, \
-    redirect, flash, request
+    redirect, flash, request, jsonify, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 
 from project.server import bcrypt, db, app
 from project.server.models import User, Idea
 from project.server.user.forms import LoginForm, RegisterForm, IdeaForm, ResetPasswordForm
+import boto3
+import sys
+from froala_editor import S3
+
 
 ################
 #### config ####
 ################
 
 user_blueprint = Blueprint('user', __name__,)
+app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 
+S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
+S3_KEY = os.environ.get("S3_ACCESS_KEY")
+S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
+S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+
+s3_client = boto3.client('s3', aws_access_key_id=S3_KEY,
+                         aws_secret_access_key=S3_SECRET)
 
 ################
 #### routes ####
 ################
+
 
 @user_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
@@ -50,12 +63,6 @@ def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        print("checking password: " + str(request.form['password']))
-        if user:
-            print("pw hash from db...")
-            print(user.password)
-            print("response form check password...")
-            print(bcrypt.check_password_hash(user.password.encode('utf-8'), request.form['password'].encode('utf-8')))
 
         if user and bcrypt.check_password_hash(
                 user.password.encode('utf-8'), request.form['password'].encode('utf-8')):
@@ -85,13 +92,9 @@ def members():
 @user_blueprint.route('/ideas/create', methods=['GET', 'POST'])
 def create_idea():
     form = IdeaForm(request.form)
-    print("form: " + str(form))
     if form.validate_on_submit():
         owner = int(current_user.id)
-        print("form owner: " + str(owner))
-        print("form title: " + str(form.title.data))
         idea = Idea(owner=owner, title=form.title.data, description=form.description.data)
-        print("idea to add: " + str(idea))
         db.session.add(idea)
         db.session.commit()
 
@@ -103,10 +106,7 @@ def create_idea():
 @user_blueprint.route('/ideas', methods=['GET', 'POST'])
 def ideas():
     owner_id = current_user.id
-    print("owner Id: " + str(owner_id))
-    print("got here")
     idea_list = Idea.query.filter_by(owner=owner_id).all()
-    print(idea_list)
     return render_template('user/ideas.html', ideas=idea_list)
 
 
@@ -146,3 +146,30 @@ def reset_password():
     return render_template('user/passwordreset.html', form=form)
 
 
+@user_blueprint.route('/get_signature', methods=['GET', 'POST'])
+def get_s3_hash():
+    config = {
+        # The name of your bucket.
+        'bucket': S3_BUCKET,
+
+        # S3 region. If you are using the default us-east-1, it this can be ignored.
+        'region': 'us-east-1',
+
+        # The folder where to upload the images.
+
+        'keyStart': current_user.email.split("@")[0] + "-" + str(current_user.id),
+
+        # File access.
+        'acl': 'public-read',
+
+        # AWS keys.
+        'accessKey': S3_KEY,
+        'secretKey': S3_SECRET
+    }
+
+    try:
+        response = S3.getHash(config)
+        print("hash response: ", response)
+    except Exception:
+        response = {'error': str(sys.exc_info()[1])}
+    return jsonify(**response)

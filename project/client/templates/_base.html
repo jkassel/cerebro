@@ -11,6 +11,18 @@
     <!-- styles -->
     <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.1/yeti/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="{{url_for('static', filename='main.css')}}" rel="stylesheet" media="screen">
+      <!-- Froala Editor CSS. -->
+      <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/froala_editor.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/froala_style.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/plugins/code_view.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/plugins/image_manager.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/plugins/image.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/plugins/table.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename='css/froala/plugins/video.css')}}">
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.css">
+
+      <link href="{{url_for('static', filename='user_profile.css')}}" rel="stylesheet" media="screen">
       <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
       <link rel="icon" href={{ url_for('static', filename='favicon.ico') }} type="image/x-icon">
     {% block css %}{% endblock %}
@@ -58,12 +70,32 @@
 
     {% include 'footer.html' %}
 
+    {% block js %}
     <!-- scripts -->
     <script src="//code.jquery.com/jquery-1.11.2.min.js" type="text/javascript"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="{{url_for('static', filename='main.js')}}" type="text/javascript"></script>
+    <!-- Froala Editor JS -->
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/mode/xml/xml.min.js"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/froala_editor.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/align.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/code_beautifier.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/code_view.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/draggable.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/image.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/image_manager.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/link.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/lists.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/paragraph_format.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/paragraph_style.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/table.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/video.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/url.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/froala/plugins/entities.min.js')}}"></script>
 
-    {% block js %}{% endblock %}
+    {% endblock %}
 
   </body>
 </html>

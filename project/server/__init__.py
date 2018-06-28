@@ -13,7 +13,7 @@ from flask_bcrypt import Bcrypt
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_ckeditor import CKEditor
 
 ################
 #### config ####
@@ -24,6 +24,8 @@ app = Flask(
     template_folder='../client/templates',
     static_folder='../client/static'
 )
+
+ckeditor = CKEditor(app)
 
 if os.getenv('environment') == 'prod':
     project_env = 'project.server.config.ProductionConfig'

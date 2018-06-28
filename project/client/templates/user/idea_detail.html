@@ -6,7 +6,7 @@
     <p>{{ idea.title }}</p>
 
     <h1>Description</h1>
-    <p>{{ idea.description }}</p>
+    <p>{{ idea.description|safe }}</p>
 
     <a href="{{ url_for('user.edit_idea', idea=idea.id) }}">edit</a>
 

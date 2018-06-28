@@ -12,7 +12,10 @@
         <div class="col-lg-8 col-sm-8">
 
             {{ wtf.form_field(form.title, class="form-control") }}
-            {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20") }}
+
+            {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20", id="edit") }}
+
+            <br><br>
 
             <button class="btn btn-success" type="submit">Add Idea</button>
             <br><br>
@@ -20,5 +23,19 @@
 
     </form>
 
+{% endblock %}
 
+{% block js %}
+{{ super() }}
+    <script>
+    $.get('/get_signature', {})
+        .done(function (s3Hash){
+                $('#edit').froalaEditor({
+                    enter: $.FroalaEditor.ENTER_P,
+                    placeholderText: null,
+                    imageUploadToS3: s3Hash,
+                    fileUploadToS3: s3Hash
+                })
+        });
+    </script>
 {% endblock %}
