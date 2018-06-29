@@ -173,3 +173,14 @@ def get_s3_hash():
     except Exception:
         response = {'error': str(sys.exc_info()[1])}
     return jsonify(**response)
+
+@user_blueprint.route('/idea/delete/<idea>', methods=['GET', 'POST'])
+def delete_idea(idea):
+    owner = current_user.id
+    Idea.query.filter_by(id=idea, owner=owner).delete()
+    db.session.commit()
+    flash('Idea Removed!', 'danger')
+    return redirect(url_for("user.ideas"))
+
+
+
