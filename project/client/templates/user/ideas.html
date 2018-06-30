@@ -12,22 +12,7 @@
     <br>
     <br>
 
-   <!-- <table class="table">
-    <thead>
-        <tr>
-            <th>Idea No.</th>
-            <th>Title</th>
-            <th>Vote Count</th>
-        </tr>
-    </thead>
-    <tbody> -->
-    {% for idea_row in ideas | batch(2, '%nbsp;') %}
-    <!--<tr>
-        <td>{#  #}{ idea.id }}</td>
-        <td><a href="{#  #}{ url_for('user.idea_detail', idea=idea.id) }}">{#  #}{ idea.title }}</a></td>
-        <td>{#  #}{ idea.description }}</td>
-        <td>{#  #}{ idea.vote_count }}</td>
-    </tr> -->
+    {% for idea_row in ideas | slice(2) %}
     <div class="row">
         {% for idea in idea_row %}
         <div class="col-sm-6">
@@ -36,14 +21,14 @@
                     <h5 class="card-title">{{ idea.title }}</h5>
                     <p class="card-text"></p>
                     <a href={{ url_for('user.idea_detail', idea=idea.id) }} class="btn btn-dark">Details</a>
+
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% endfor %}
-    <!-- </tbody>
-</table> -->
+
 {% endblock %}
 
 </div>

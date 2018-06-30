@@ -94,7 +94,8 @@ def create_idea():
     form = IdeaForm(request.form)
     if form.validate_on_submit():
         owner = int(current_user.id)
-        idea = Idea(owner=owner, title=form.title.data, description=form.description.data)
+        idea = Idea(owner=owner, title=form.title.data, description=form.description.data,
+                    access=form.access.data)
         db.session.add(idea)
         db.session.commit()
 
@@ -124,6 +125,7 @@ def edit_idea(idea):
         idea_result = Idea.query.filter_by(id=idea).first()
         idea_result.title = form.title.data
         idea_result.description = form.description.data
+        idea_result.access = form.access.data
         db.session.commit()
         flash('Idea Updated!', 'success')
         return redirect(url_for("user.idea_detail", idea=idea))
@@ -146,7 +148,7 @@ def reset_password():
     return render_template('user/passwordreset.html', form=form)
 
 
-@user_blueprint.route('/get_signature', methods=['GET', 'POST'])
+@user_blueprint.route('/gethash', methods=['GET', 'POST'])
 def get_s3_hash():
     config = {
         # The name of your bucket.
@@ -174,6 +176,7 @@ def get_s3_hash():
         response = {'error': str(sys.exc_info()[1])}
     return jsonify(**response)
 
+
 @user_blueprint.route('/idea/delete/<idea>', methods=['GET', 'POST'])
 def delete_idea(idea):
     owner = current_user.id
@@ -181,6 +184,11 @@ def delete_idea(idea):
     db.session.commit()
     flash('Idea Removed!', 'danger')
     return redirect(url_for("user.ideas"))
+
+
+@user_blueprint.route('/profile/<user>')
+def user_profile(user):
+    return render_template('user/user_profile.html', user=user)
 
 
 

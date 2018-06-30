@@ -1,7 +1,7 @@
 # project/server/user/forms.py
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 from wtforms.widgets import TextArea
 
@@ -31,6 +31,7 @@ class RegisterForm(FlaskForm):
 class IdeaForm(FlaskForm):
     title = StringField('Title')
     description = StringField('Description', widget=TextArea())
+    access = SelectField('Access', choices=[("public", "Public"), ("private", "Private")], default="private")
 
 
 class ResetPasswordForm(FlaskForm):

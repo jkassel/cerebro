@@ -28,9 +28,8 @@
             {{ wtf.form_field(form.title, class="form-control") }}
             <br><br>
             {{ wtf.form_field(form.description, class="form-control", cols="80", rows="20", id="edit") }}
-
             <br><br>
-
+            {{ wtf.form_field(form.access, class="form-control") }}
            <!-- <button class="btn btn-success" type="submit">Add Idea</button> -->
 
 
@@ -48,7 +47,7 @@
 {% block js %}
 {{ super() }}
     <script>
-    $.get('/get_signature', {})
+    $.get('/gethash', {})
         .done(function (s3Hash){
                 $('#edit').froalaEditor({
                     enter: $.FroalaEditor.ENTER_P,
