@@ -15,8 +15,31 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
+    first_name = db.Column(db.String(255), nullable=True)
+    last_name = db.Column(db.String(255), nullable=True)
+    profile_status = db.Column(db.String(255), nullable=False)
+    profile_pic = db.Column(db.String(1024), nullable=True)
+    about_me = db.Column(db.String(1024), nullable=True)
+    location = db.Column(db.String(255), nullable=False)
+    age = db.Column(db.String(255), nullable=False)
+    website = db.Column(db.String(1024), nullable=False)
+    facebook_url = db.Column(db.String(255), nullable=False)
+    twitter_url = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, email, password, admin=False, first_name="", last_name="", profile_status="private"):
+    def __init__(self, email,
+                 password,
+                 admin=False,
+                 first_name="",
+                 last_name="",
+                 profile_status="private",
+                 profile_pic="https://s3.amazonaws.com/cerebro-kassellabs-data/public/default-user-image.png",
+                 about_me="",
+                 location="",
+                 age=None,
+                 website="#",
+                 facebook_url="#",
+                 twitter_url="#"
+                 ):
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, app.config.get('BCRYPT_LOG_ROUNDS')
@@ -24,9 +47,17 @@ class User(db.Model):
         self.registered_on = datetime.datetime.now()
         self.admin = admin
 
-        self.first_name = db.Column(db.String(255), nullable=True)
-        self.last_name = db.Column(db.String(255), nullable=True)
-        self.profile_status = db.Column(db.String(255), nullable=False)
+        self.first_name = first_name
+        self.last_name = last_name
+        self.profile_status = profile_status
+        self.profile_pic = profile_pic
+        self.about_me = about_me
+
+        self.location = location
+        self.age = age
+        self.website = website
+        self.facebook_url = facebook_url
+        self.twitter_url = twitter_url
 
     def is_authenticated(self):
         return True
@@ -42,6 +73,9 @@ class User(db.Model):
 
     def get_profile_status(self):
         return self.profile_status
+
+    def get_sign_up_date(self):
+        return pretty_date(self.registered_on)
 
     def __repr__(self):
         return '<User {0}>'.format(self.email)
@@ -97,3 +131,45 @@ class UserProfile(db.Model):
         self.user = user
 
 
+def pretty_date(time=False):
+    """
+    Get a datetime object or a int() Epoch timestamp and return a
+    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
+    'just now', etc
+    """
+    from datetime import datetime
+    now = datetime.now()
+    if type(time) is int:
+        diff = now - datetime.fromtimestamp(time)
+    elif isinstance(time,datetime):
+        diff = now - time
+    elif not time:
+        diff = now - now
+    second_diff = diff.seconds
+    day_diff = diff.days
+
+    if day_diff < 0:
+        return ''
+
+    if day_diff == 0:
+        if second_diff < 10:
+            return "just now"
+        if second_diff < 60:
+            return str(int(second_diff)) + " seconds ago"
+        if second_diff < 120:
+            return "a minute ago"
+        if second_diff < 3600:
+            return str(int(second_diff / 60)) + " minutes ago"
+        if second_diff < 7200:
+            return "an hour ago"
+        if second_diff < 86400:
+            return str(int(second_diff / 3600)) + " hours ago"
+    if day_diff == 1:
+        return "Yesterday"
+    if day_diff < 7:
+        return str(day_diff) + " days ago"
+    if day_diff < 31:
+        return str(int(day_diff / 7)) + " weeks ago"
+    if day_diff < 365:
+        return str(int(day_diff / 30)) + " months ago"
+    return str(int(day_diff / 365)) + " years ago"

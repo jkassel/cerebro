@@ -1,5 +1,5 @@
 {% extends "_base.html" %}
-
+{% block content %}
 <div id="user-profile-2" class="user-profile">
     <div class="tabbable">
         <ul class="nav nav-tabs padding-18">
@@ -12,22 +12,15 @@
 
             <li>
                 <a data-toggle="tab" href="#feed">
-                    <i class="black ace-icon fa fa-rss bigger-120"></i>
-                    Activity Feed
+                    <i class="black ace-icon fa fa-lightbulb-o bigger-120"></i>
+                    Ideas
                 </a>
             </li>
 
             <li>
                 <a data-toggle="tab" href="#friends">
                     <i class="black ace-icon fa fa-users bigger-120"></i>
-                    Friends
-                </a>
-            </li>
-
-            <li>
-                <a data-toggle="tab" href="#pictures">
-                    <i class="black ace-icon fa fa-picture-o bigger-120"></i>
-                    Pictures
+                    Team
                 </a>
             </li>
         </ul>
@@ -37,7 +30,7 @@
                 <div class="row">
                     <div class="col-xs-12 col-sm-3 center">
 							<span class="profile-picture">
-								<img class="editable img-responsive" alt=" Avatar" id="avatar2" src="http://bootdey.com/img/Content/avatar/avatar6.png">
+								<img class="editable img-fluid" alt="Avatar" id="avatar2" src={{ user.profile_pic }}>
 							</span>
 
                         <div class="space space-4"></div>
@@ -55,11 +48,15 @@
 
                     <div class="col-xs-12 col-sm-9">
                         <h4 class="grey">
-                            <span class="middle">John Doe</span>
+                            <span class="middle">{{ user.first_name }} {{ user.last_name }}</span>
 
                             <span class="label label-purple arrowed-in-right">
 									<i class="ace-icon fa fa-circle smaller-80 align-middle"></i>
-									online
+									{% if user.is_active %}
+                                        online
+                                        {% else %}
+                                        offline
+                                    {% endif %}
 								</span>
                         </h4>
 
@@ -68,7 +65,7 @@
                                 <div class="profile-info-name"> Username </div>
 
                                 <div class="profile-info-value">
-                                    <span>alexdoe</span>
+                                    <span>{{ user.email }}</span>
                                 </div>
                             </div>
 
@@ -77,16 +74,15 @@
 
                                 <div class="profile-info-value">
                                     <i class="fa fa-map-marker light-orange bigger-110"></i>
-                                    <span>Netherlands</span>
-                                    <span>Amsterdam</span>
+                                    <span>{{ user.location }}</span>
                                 </div>
                             </div>
 
                             <div class="profile-info-row">
-                                <div class="profile-info-name"> Age </div>
+                                <div class="profile-info-name"> Age</div>
 
                                 <div class="profile-info-value">
-                                    <span>38</span>
+                                    <span>{{ user.age }} </span>
                                 </div>
                             </div>
 
@@ -94,15 +90,15 @@
                                 <div class="profile-info-name"> Joined </div>
 
                                 <div class="profile-info-value">
-                                    <span>2010/06/20</span>
+                                    <span>{{ user.get_sign_up_date() }}</span>
                                 </div>
                             </div>
 
                             <div class="profile-info-row">
-                                <div class="profile-info-name"> Last Online </div>
+                                <div class="profile-info-name"> Last Online (demo)</div>
 
                                 <div class="profile-info-value">
-                                    <span>3 hours ago</span>
+                                    <span>3 hours ago  </span>
                                 </div>
                             </div>
                         </div>
@@ -114,7 +110,7 @@
                                 <div class="profile-info-name"> Website </div>
 
                                 <div class="profile-info-value">
-                                    <a href="#" target="_blank">www.alexdoe.com</a>
+                                    <a href={{ user.website }} target="_blank">{{ user.website }}</a>
                                 </div>
                             </div>
 
@@ -124,7 +120,7 @@
                                 </div>
 
                                 <div class="profile-info-value">
-                                    <a href="#">Find me on Facebook</a>
+                                    <a href={{ user.facebook_url }}>Find me on Facebook</a>
                                 </div>
                             </div>
 
@@ -134,7 +130,7 @@
                                 </div>
 
                                 <div class="profile-info-value">
-                                    <a href="#">Follow me on Twitter</a>
+                                    <a href={{ user.twitter_url }}>Follow me on Twitter</a>
                                 </div>
                             </div>
                         </div>
@@ -149,24 +145,13 @@
                             <div class="widget-header widget-header-small">
                                 <h4 class="widget-title smaller">
                                     <i class="ace-icon fa fa-check-square-o bigger-110"></i>
-                                    Little About Me
+                                    About Me
                                 </h4>
                             </div>
 
                             <div class="widget-body">
                                 <div class="widget-main">
-                                    <p>
-                                        My job is mostly lorem ipsuming and dolor sit ameting as long as consectetur adipiscing elit.
-                                    </p>
-                                    <p>
-                                        Sometimes quisque commodo massa gets in the way and sed ipsum porttitor facilisis.
-                                    </p>
-                                    <p>
-                                        The best thing about my job is that vestibulum id ligula porta felis euismod and nullam quis risus eget urna mollis ornare.
-                                    </p>
-                                    <p>
-                                        Thanks for visiting my profile.
-                                    </p>
+                                    {{ user.about_me }}
                                 </div>
                             </div>
                         </div>
@@ -1050,3 +1035,5 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
