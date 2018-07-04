@@ -11,11 +11,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from project.server import bcrypt, db, app
 from project.server.models import User, Idea
-from project.server.user.forms import LoginForm, RegisterForm, IdeaForm, ResetPasswordForm
+from project.server.user.forms import LoginForm, RegisterForm, IdeaForm, ResetPasswordForm, UserProfileForm
 import boto3
 import sys
+import datetime
 from froala_editor import S3
-
+import secrets
 
 ################
 #### config ####
@@ -24,9 +25,9 @@ from froala_editor import S3
 user_blueprint = Blueprint('user', __name__,)
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 
-S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
-S3_KEY = os.environ.get("S3_ACCESS_KEY")
-S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
+S3_BUCKET = os.environ.get("S3_BUCKET")
+S3_KEY = os.environ.get("S3_KEY")
+S3_SECRET = os.environ.get("S3_SECRET")
 S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
 
 s3_client = boto3.client('s3', aws_access_key_id=S3_KEY,
@@ -43,6 +44,7 @@ def register():
     if form.validate_on_submit():
 
         user = User(
+            user_name=form.user_name.data,
             email=form.email.data,
             password=form.password.data
         )
@@ -67,6 +69,8 @@ def login():
         if user and bcrypt.check_password_hash(
                 user.password.encode('utf-8'), request.form['password'].encode('utf-8')):
             login_user(user)
+            current_user.last_login = datetime.datetime.now()
+            db.session.commit()
             flash('You are logged in. Welcome!', 'success')
             return redirect(url_for('user.ideas'))
         else:
@@ -186,10 +190,67 @@ def delete_idea(idea):
     return redirect(url_for("user.ideas"))
 
 
-@user_blueprint.route('/user/<username>')
+@user_blueprint.route('/account', methods=['GET', 'POST'])
 @login_required
-def user_profile(username):
+def account():
+    form = UserProfileForm()
+    if form.validate_on_submit():
+
+        if form.profile_pic.data:
+            picture_url = save_picture(form.profile_pic.data)
+            current_user.profile_pic = picture_url
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.location = form.location.data
+        current_user.user_name = form.user_name.data
+        current_user.email = form.email.data
+        current_user.age = form.age.data
+        current_user.website = form.website.data
+        current_user.facebook_url = form.facebook_url.data
+        current_user.twitter_url = form.twitter_url.data
+        current_user.about_me = form.about_me.data
+
+        db.session.commit()
+        flash('Account Updated!', 'success')
+        return redirect(url_for('user.account'))
+    elif request.method == 'GET':
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.user_name.data = current_user.user_name
+        form.email.data = current_user.email
+        form.location.data = current_user.location
+        form.age.data = current_user.age
+        form.website.data = current_user.website
+        form.facebook_url.data = current_user.facebook_url
+        form.twitter_url.data = current_user.twitter_url
+        form.about_me.data = current_user.about_me
+    username = current_user.id
     user = User.query.filter_by(id=username).first_or_404()
     user_ideas = Idea.query.filter_by(owner=user.id).all()
-    return render_template('user/user_profile.html', user=user, ideas=user_ideas)
+    return render_template('user/account.html', user=user, ideas=user_ideas, form=form)
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    f_name, f_ext = os.path.splitext(form_picture.filename)
+
+    picture_filename = random_hex + f_ext
+    file_prefix = current_user.user_name + str(current_user.id)
+    full_filename = "public/" + file_prefix + "/" + picture_filename
+    bucket = S3_BUCKET
+    try:
+        s3_client.upload_fileobj(
+            form_picture,
+            bucket,
+            full_filename,
+            ExtraArgs={
+                "ACL": 'public-read',
+                "ContentType": form_picture.content_type
+            }
+        )
+    except Exception as e:
+        print("Error saving picture: ", e)
+
+    picture_url = "https://s3.amazonaws.com/" + bucket + "/" + full_filename
+    return picture_url
 

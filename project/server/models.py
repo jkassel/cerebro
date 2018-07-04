@@ -11,22 +11,25 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_name = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
+    last_login = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     first_name = db.Column(db.String(255), nullable=True)
     last_name = db.Column(db.String(255), nullable=True)
     profile_status = db.Column(db.String(255), nullable=False)
     profile_pic = db.Column(db.String(1024), nullable=True)
     about_me = db.Column(db.String(1024), nullable=True)
-    location = db.Column(db.String(255), nullable=False)
-    age = db.Column(db.String(255), nullable=False)
-    website = db.Column(db.String(1024), nullable=False)
-    facebook_url = db.Column(db.String(255), nullable=False)
-    twitter_url = db.Column(db.String(255), nullable=False)
+    location = db.Column(db.String(255), nullable=True)
+    age = db.Column(db.String(255), nullable=True)
+    website = db.Column(db.String(1024), nullable=True)
+    facebook_url = db.Column(db.String(255), nullable=True)
+    twitter_url = db.Column(db.String(255), nullable=True)
 
-    def __init__(self, email,
+    def __init__(self, user_name,
+                 email,
                  password,
                  admin=False,
                  first_name="",
@@ -38,13 +41,15 @@ class User(db.Model):
                  age=None,
                  website="#",
                  facebook_url="#",
-                 twitter_url="#"
+                 twitter_url="#",
                  ):
+        self.user_name = user_name
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode('utf-8')
         self.registered_on = datetime.datetime.now()
+        self.last_login = datetime.datetime.now()
         self.admin = admin
 
         self.first_name = first_name
@@ -77,6 +82,9 @@ class User(db.Model):
     def get_sign_up_date(self):
         return pretty_date(self.registered_on)
 
+    def get_last_login(self):
+        return pretty_date(self.last_login)
+
     def __repr__(self):
         return '<User {0}>'.format(self.email)
 
@@ -90,6 +98,7 @@ class Idea(db.Model):
     description = db.Column(db.String(1024), nullable=True)
     owner = db.Column(db.Integer, nullable=False)
     rating = db.Column(db.Integer, nullable=True)
+    created_date = db.Column(db.DateTime, nullable=False)
 
     # access types: public, private, team
     access = db.Column(db.String(255), nullable=False)
@@ -100,6 +109,7 @@ class Idea(db.Model):
         self.description = description
         self.rating = 0
         self.access = access
+        self.created_date = datetime.datetime.now()
 
     def get_title(self):
         return self.title
@@ -113,22 +123,36 @@ class Idea(db.Model):
     def get_access(self):
         return self.access
 
+    def get_created_date(self):
+        return pretty_date(self.registered_on)
+
     def __repr__(self):
         return '<Idea {0}'.format(self.title)
 
 
-class UserProfile(db.Model):
-    __tablename__ = "user_profile"
+class AuditLog(db.Model):
+
+    __tablename__ = "audit_log"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    first_name = db.Column(db.String(255), nullable=True)
-    last_name = db.Column(db.String(255), nullable=True)
     user = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    action = db.Column(db.String(255), nullable=False)
+    resource = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, user, first_name="", last_name=""):
-        self.first_name = first_name
-        self.last_name = last_name
+    def __init__(self, user, action, resource):
+
+        # actions <resource>:
+        #   login, logout
+        #   created idea <idea>, updated idea <idea>, deleted idea <idea>
+        #   added <user> to team
+        #   updated profile
+        #   started project on idea <idea>
+
+        self.timestamp = datetime.datetime.now()
         self.user = user
+        self.action = action
+        self.resource = resource
 
 
 def pretty_date(time=False):

@@ -51,21 +51,29 @@
                             <span class="middle">{{ user.first_name }} {{ user.last_name }}</span>
 
                             <span class="label label-purple arrowed-in-right">
-									<i class="ace-icon fa fa-circle smaller-80 align-middle"></i>
+
 									{% if user.is_active %}
+                                        <i class="fa fa-circle green smaller-80 align-middle"></i>
                                         online
                                         {% else %}
+                                        <i class="fa fa-circle smaller-80 align-middle"></i>
                                         offline
                                     {% endif %}
 								</span>
                         </h4>
 
+                        <form class="form" role="form" method="post" action="">
+
+                            {{ form.csrf_token }}
+                            {{ form.hidden_tag() }}
+                            {{ wtf.form_errors(form, hiddens="only") }}
+
                         <div class="profile-user-info">
                             <div class="profile-info-row">
-                                <div class="profile-info-name"> Username </div>
+                                <div class="profile-info-name"> {{ wtf.form_field(form.user_name) }} </div>
 
                                 <div class="profile-info-value">
-                                    <span>{{ user.email }}</span>
+                                    <span>{{ wtf.form_field(form.email) }} </span>
                                 </div>
                             </div>
 
@@ -74,7 +82,7 @@
 
                                 <div class="profile-info-value">
                                     <i class="fa fa-map-marker light-orange bigger-110"></i>
-                                    <span>{{ user.location }}</span>
+                                    <span>{{ wtf.form_field(form.location) }}</span>
                                 </div>
                             </div>
 
@@ -82,7 +90,7 @@
                                 <div class="profile-info-name"> Age</div>
 
                                 <div class="profile-info-value">
-                                    <span>{{ user.age }} </span>
+                                    <span>{{ wtf.form_field(form.age) }}</span>
                                 </div>
                             </div>
 
@@ -95,10 +103,10 @@
                             </div>
 
                             <div class="profile-info-row">
-                                <div class="profile-info-name"> Last Online (demo)</div>
+                                <div class="profile-info-name"> Last Online</div>
 
                                 <div class="profile-info-value">
-                                    <span>3 hours ago  </span>
+                                    <span>{{ user.get_last_login() }}  </span>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +118,7 @@
                                 <div class="profile-info-name"> Website </div>
 
                                 <div class="profile-info-value">
-                                    <a href={{ user.website }} target="_blank">{{ user.website }}</a>
+                                    <span>{{ user.website }}</span>
                                 </div>
                             </div>
 
@@ -120,7 +128,7 @@
                                 </div>
 
                                 <div class="profile-info-value">
-                                    <a href={{ user.facebook_url }}>Find me on Facebook</a>
+                                    <span>{{ wtf.form_field(form.facebook_url) }}</span>
                                 </div>
                             </div>
 
@@ -130,7 +138,7 @@
                                 </div>
 
                                 <div class="profile-info-value">
-                                    <a href={{ user.twitter_url }}>Follow me on Twitter</a>
+                                    <span>{{ wtf.form_field(form.twitter_url) }}</span>
                                 </div>
                             </div>
                         </div>
