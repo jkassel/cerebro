@@ -124,7 +124,7 @@ class Idea(db.Model):
         return self.access
 
     def get_created_date(self):
-        return pretty_date(self.registered_on)
+        return pretty_date(self.created_date)
 
     def get_username(self, id):
         user = User.query.filter_by(id=id).first()
@@ -252,18 +252,22 @@ class Team(db.Model):
         return users
 
     def __repr__(self):
-        return '<Idea {0}'.format(self.title)
+        return '<Team {0}'.format(self.name)
 
 
 class TeamMembership(db.Model):
 
-    __tablename__= "team_membership"
+    __tablename__ = "team_membership"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     team_id = db.Column(db.Integer, nullable=False)
     member_id = db.Column(db.Integer, nullable=False)
+    created_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, team_id, member_id):
         self.team_id = team_id
         self.member_id = member_id
         self.created_date = datetime.datetime.now()
+
+    def __repr__(self):
+        return '<TeamMembership {0}'.format(self.id)

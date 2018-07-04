@@ -32,6 +32,16 @@ class RegisterForm(FlaskForm):
     email = StringField(
         'Email Address',
         validators=[DataRequired(), Email(message=None), Length(min=6, max=40)])
+
+    first_name = StringField('First Name')
+    last_name = StringField('Last Name')
+    age = IntegerField('Age', [validators.optional()])
+    website = StringField('Website')
+    facebook_url = StringField('Facebook URL')
+    twitter_url = StringField('Twitter URL')
+    about_me = StringField('About Me', widget=TextArea())
+    location = StringField('Location')
+
     password = PasswordField(
         'Password',
         validators=[DataRequired(), Length(min=6, max=25)]

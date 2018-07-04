@@ -10,7 +10,7 @@ from flask import render_template, Blueprint, url_for, \
 from flask_login import login_user, logout_user, login_required, current_user
 
 from project.server import bcrypt, db, app
-from project.server.models import User, Idea
+from project.server.models import User, Idea, Team, TeamMembership
 from project.server.user.forms import LoginForm, RegisterForm, IdeaForm, ResetPasswordForm, UserProfileForm
 import boto3
 import sys
@@ -50,6 +50,18 @@ def register():
         )
 
         db.session.add(user)
+        db.session.commit()
+        db.session.refresh(user)
+
+        # create default team
+        team = Team(name="default", owner=user.id)
+        db.session.add(team)
+        db.session.commit()
+        db.session.refresh(team)
+
+        # add self to default team
+        team_membership = TeamMembership(team_id=team.id, member_id=user.id)
+        db.session.add(team_membership)
         db.session.commit()
 
         login_user(user)
@@ -199,7 +211,33 @@ def delete_idea(idea):
 @user_blueprint.route('/user/<username>', methods=['GET', 'POST'])
 def user_profile(username):
     user = User.query.filter_by(user_name=username).first()
-    return render_template('user/user_profile.html', user=user)
+    ideas = Idea.query.filter_by(owner=user.id).all()
+
+    # team_member_ids = Team.get_team_member_ids(user.id)
+    team = Team.query.filter_by(owner=user.id, name="default").first()
+    team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+
+    team_members = []
+
+    for membership in team_memberships:
+        if membership.member_id != user.id:
+            team_members.append(User.query.filter_by(id=membership.member_id).first())
+
+    return render_template('user/user_profile.html', user=user, ideas=ideas, team_members=team_members)
+
+@user_blueprint.route('/add_to_team/<username>', methods=['GET', 'POST'])
+@login_required
+def add_to_team(username):
+    user = User.query.filter_by(user_name=username).first()
+
+    team = Team.query.filter_by(owner=current_user.id).first()
+
+    team_membership = TeamMembership(team_id=team.id, member_id=user.id)
+
+    db.session.add(team_membership)
+    db.session.commit()
+    flash("Team Member Added to your Team!", 'success')
+    return redirect(url_for('user.user_profile', username=user.user_name))
 
 
 @user_blueprint.route('/account', methods=['GET', 'POST'])
