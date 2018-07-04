@@ -201,3 +201,69 @@ def pretty_date(time=False):
     if day_diff < 365:
         return str(int(day_diff / 30)) + " months ago"
     return str(int(day_diff / 365)) + " years ago"
+
+
+class Team(db.Model):
+
+    __tablename__ = "teams"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(1024), nullable=True)
+    owner = db.Column(db.Integer, nullable=False)
+    created_date = db.Column(db.DateTime, nullable=False)
+
+    # access types: public, private, invite-only; for now only the owner can add members (aka private)
+    access = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, owner, name, access="private", description=""):
+        self.owner = owner
+        self.name = name
+        self.description = description
+        self.access = access
+        self.created_date = datetime.datetime.now()
+
+    def get_name(self):
+        return self.name
+
+    def get_description(self):
+        return self.description
+
+    def get_access(self):
+        return self.access
+
+    def get_created_date(self):
+        return pretty_date(self.registered_on)
+
+    def get_owner(self):
+        user = User.query.filter_by(id=self.owner.id).first()
+        return user.user_name
+
+    def get_team_member_ids(self):
+        members = TeamMembership.query.filter_by(team_id=self.id).all()
+        return members
+
+    def get_team_member_users(self):
+        members = TeamMembership.query.filter_by(team_id=self.id).all()
+        users = []
+        for member in members:
+            user = User.query.filter_by(id=member).first()
+            users.append(user.user_name)
+        return users
+
+    def __repr__(self):
+        return '<Idea {0}'.format(self.title)
+
+
+class TeamMembership(db.Model):
+
+    __tablename__= "team_membership"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    team_id = db.Column(db.Integer, nullable=False)
+    member_id = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, team_id, member_id):
+        self.team_id = team_id
+        self.member_id = member_id
+        self.created_date = datetime.datetime.now()

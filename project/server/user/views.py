@@ -196,6 +196,12 @@ def delete_idea(idea):
     return redirect(url_for("user.ideas"))
 
 
+@user_blueprint.route('/user/<username>', methods=['GET', 'POST'])
+def user_profile(username):
+    user = User.query.filter_by(user_name=username).first()
+    return render_template('user/user_profile.html', user=user)
+
+
 @user_blueprint.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():

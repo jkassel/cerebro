@@ -29,8 +29,8 @@
             <div id="home" class="tab-pane in active">
                 <div class="row">
                     <div class="col-xs-12 col-sm-3 center">
-							<span class="profile-picture">
-								<img class="editable img-fluid" alt="Avatar" id="avatar2" src={{ user.profile_pic }}>
+							<span class="profile-picture rounded-circle">
+								<img class="editable img-fluid rounded-circle" alt="Avatar" id="avatar2" src={{ user.profile_pic }}>
 							</span>
 
                         <div class="space space-4"></div>
@@ -62,18 +62,12 @@
 								</span>
                         </h4>
 
-                        <form class="form" role="form" method="post" action="">
-
-                            {{ form.csrf_token }}
-                            {{ form.hidden_tag() }}
-                            {{ wtf.form_errors(form, hiddens="only") }}
-
                         <div class="profile-user-info">
                             <div class="profile-info-row">
-                                <div class="profile-info-name"> {{ wtf.form_field(form.user_name) }} </div>
+                                <div class="profile-info-name"> {{ user.user_name }} </div>
 
                                 <div class="profile-info-value">
-                                    <span>{{ wtf.form_field(form.email) }} </span>
+                                    <span>{{ user.email }} </span>
                                 </div>
                             </div>
 
@@ -82,7 +76,7 @@
 
                                 <div class="profile-info-value">
                                     <i class="fa fa-map-marker light-orange bigger-110"></i>
-                                    <span>{{ wtf.form_field(form.location) }}</span>
+                                    <span>{{ user.location }}</span>
                                 </div>
                             </div>
 
@@ -90,7 +84,7 @@
                                 <div class="profile-info-name"> Age</div>
 
                                 <div class="profile-info-value">
-                                    <span>{{ wtf.form_field(form.age) }}</span>
+                                    <span>{{ user.age }}</span>
                                 </div>
                             </div>
 
@@ -128,7 +122,7 @@
                                 </div>
 
                                 <div class="profile-info-value">
-                                    <span>{{ wtf.form_field(form.facebook_url) }}</span>
+                                    <span>{{ user.facebook_url }}</span>
                                 </div>
                             </div>
 
@@ -138,7 +132,7 @@
                                 </div>
 
                                 <div class="profile-info-value">
-                                    <span>{{ wtf.form_field(form.twitter_url) }}</span>
+                                    <span>{{ user.twitter_url }}</span>
                                 </div>
                             </div>
                         </div>

@@ -4,9 +4,10 @@
 import os
 import unittest
 import coverage
-
+import random
 from flask_script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
+
 
 COV = coverage.coverage(
     branch=True,
@@ -20,7 +21,7 @@ COV = coverage.coverage(
 COV.start()
 
 from project.server import app, db
-from project.server.models import User
+from project.server.models import User, Idea
 
 
 migrate = Migrate(app, db)
@@ -79,9 +80,73 @@ def create_admin():
 
 
 @manager.command
+def create_users():
+    db.session.add(User(
+        user_name="jkassel",
+        email="jkassel@gmail.com",
+        first_name="Jeff",
+        last_name="Kassel",
+        location="Staten Island, NY",
+        website="http://kassellabs.com",
+        age=36,
+        password="Password12!",
+        about_me="Some stuff about me"
+    ))
+
+    db.session.add(User(
+        user_name="jsmith",
+        email="jsmith@jsmith.com",
+        first_name="John",
+        last_name="Smith",
+        location="Orlando, FL",
+        website="http://jsmith.com",
+        age=36,
+        password="Password12!",
+        about_me="Some stuff about me"
+    ))
+
+    db.session.add(User(
+        user_name="mjordan",
+        email="michael@jordan.com",
+        first_name="Michael",
+        last_name="Jordan",
+        location="Charlotte, NC",
+        website="http://michaeljordan.com",
+        age=56,
+        password="Password12!",
+        about_me="I like basketball"
+    ))
+
+    db.session.add(User(
+        user_name="mtyson",
+        email="mike@tyson.com",
+        first_name="Mike",
+        last_name="Tyson",
+        location="Brooklyn, NY",
+        website="http://miketyson.com",
+        age=56,
+        password="Password12!",
+        about_me="I like to hit people"
+    ))
+
+    db.session.commit()
+    print("Users created.")
+
+
+@manager.command
 def create_data():
-    """Creates sample data."""
-    pass
+
+    users = User.query.all()
+    for user in users:
+        for x in range(60):
+            access_list = ['public', 'private']
+            db.session.add(Idea(
+                title="idea" + str(x),
+                description="this is a test idea",
+                owner=user.id,
+                access=random.choice(access_list)
+            ))
+    db.session.commit()
 
 
 port = int(os.environ.get('PORT', 5000))
