@@ -126,6 +126,10 @@ class Idea(db.Model):
     def get_created_date(self):
         return pretty_date(self.registered_on)
 
+    def get_username(self, id):
+        user = User.query.filter_by(id=id).first()
+        return user.user_name
+
     def __repr__(self):
         return '<Idea {0}'.format(self.title)
 

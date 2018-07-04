@@ -104,15 +104,21 @@ def create_idea():
         db.session.commit()
 
         flash('Idea Added!', 'success')
-        return redirect(url_for("user.ideas"))
+        return redirect(url_for("user.my_ideas"))
     return render_template('user/create_idea.html', form=form)
+
+
+@user_blueprint.route('/my_ideas', methods=['GET', 'POST'])
+def my_ideas():
+    owner_id = current_user.id
+    idea_list = Idea.query.filter_by(owner=owner_id).all()
+    return render_template('user/ideas.html', ideas=idea_list, title='My Ideas')
 
 
 @user_blueprint.route('/ideas', methods=['GET', 'POST'])
 def ideas():
-    owner_id = current_user.id
-    idea_list = Idea.query.filter_by(owner=owner_id).all()
-    return render_template('user/ideas.html', ideas=idea_list)
+    idea_list = Idea.query.filter_by(access='public')
+    return render_template('user/ideas.html', ideas=idea_list, title='Ideas')
 
 
 @user_blueprint.route('/ideas/<idea>/', methods=['GET', 'POST'])

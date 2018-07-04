@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container">
     <div class="row">
-        <h1>Ideas</h1>
+        <h1>{{ title }}</h1>
 
         <a class="btn btn-dark btn-lg ml-auto" href="{{ url_for('user.create_idea') }}">
             <i class="fa fa-plus-circle"></i> Add an Idea
@@ -19,7 +19,7 @@
             <div class="card border-secondary mb-3" style="max-width: 28rem;">
                 <div class="card-body text-secondary">
                     <h5 class="card-title">{{ idea.title }}</h5>
-                    <p class="card-text"></p>
+                    <p class="card-text">Created By: {{ idea.get_username(idea.owner) }}</p>
                     <a href={{ url_for('user.idea_detail', idea=idea.id) }} class="btn btn-dark">Details</a>
 
                 </div>
