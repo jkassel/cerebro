@@ -425,49 +425,77 @@
             </div><!-- /#feed -->
 
             <div id="ideas" class="tab-pane">
+                {% if ideas|length > 0 %}
+                    {% for idea_row in ideas | slice(2) %}
                 <div class="profile-feed row">
-                    {% if ideas|length > 0 %}
-                    <div class="col-sm-6">
-                        {% for idea in ideas %}
-                        <div class="profile-activity clearfix">
-                            <div>
+                        {% for idea in idea_row %}
+                        <div class="col-sm-6">
+                            <div class="profile-activity clearfix">
+                                <div>
 
-                                {{ idea.title }}
+                                    {{ idea.title }}
 
-                                <a href={{ url_for('user.ideas',idea=idea.id) }}>Details</a>
+                                    <a href={{ url_for('user.idea_detail',idea=idea.id) }}>Details</a>
 
-                                <div class="time">
-                                    <i class="ace-icon fa fa-clock-o bigger-110"></i>
-                                    {{ idea.get_created_date() }}
+                                    <div class="time">
+                                        <i class="ace-icon fa fa-clock-o bigger-110"></i>
+                                        {{ idea.get_created_date() }}
+                                    </div>
                                 </div>
+                                {% if idea.owner == current_user.id %}
+                                <div class="tools action-buttons">
+                                    <a href={{ url_for('user.edit_idea', idea=idea.id) }} class="blue">
+                                        <i class="ace-icon fa fa-pencil bigger-125"></i>
+                                    </a>
+
+                                    <a href="#" class="red" data-toggle="modal" data-target="#confirmModal">
+                                        <i class="ace-icon fa fa-times bigger-125"></i>
+                                    </a>
+                                </div>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="confirmModalLabel">Are you Sure you want to remove this idea?</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    This action cannot be undone.
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <a class="btn btn-danger btn-lg ml-auto" href="{{ url_for('user.delete_idea', idea=idea.id) }}">
+                                                        <i class="fa fa-times"></i> Confirm Remove
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                {% endif %}
                             </div>
 
-                            <div class="tools action-buttons">
-                                <a href="#" class="blue">
-                                    <i class="ace-icon fa fa-pencil bigger-125"></i>
-                                </a>
-
-                                <a href="#" class="red">
-                                    <i class="ace-icon fa fa-times bigger-125"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                    </div><!-- /.col -->
-
-                    <div class="col-sm-6">
-
-                    </div><!-- /.col -->
+                        </div><!-- /.col -->
                     {% endfor %}
+
                 </div><!-- /.row -->
-                {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    No Ideas at the moment.
+                    {% endif %}
+
+
 
                 <div class="space-12"></div>
 
                 <div class="center">
                     <button type="button" class="btn btn-sm btn-primary btn-white btn-round">
-                        <i class="ace-icon fa fa-rss bigger-150 middle orange2"></i>
-                        <span class="bigger-110">View more activities</span>
+                        <i class="ace-icon fa bigger-150 middle orange2"></i>
+                        <span class="bigger-110">View more ideas</span>
 
                         <i class="icon-on-right ace-icon fa fa-arrow-right"></i>
                     </button>
@@ -769,5 +797,8 @@
         </div>
     </div>
 </div>
+
+
+
 
 {% endblock %}

@@ -124,12 +124,27 @@ def create_idea():
 def my_ideas():
     owner_id = current_user.id
     idea_list = Idea.query.filter_by(owner=owner_id).all()
+
     return render_template('user/ideas.html', ideas=idea_list, title='My Ideas')
+
+
+@user_blueprint.route('/team_ideas', methods=['GET', 'POST'])
+def team_ideas():
+    team = Team.query.filter_by(owner=current_user.id, name="default").first()
+    team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+
+    idea_list = []
+    for membership in team_memberships:
+        idea_list.extend(Idea.query.filter_by(owner=membership.member_id, access="team").all())
+
+
+    return render_template('user/ideas.html', ideas=idea_list, title='Team Ideas')
 
 
 @user_blueprint.route('/ideas', methods=['GET', 'POST'])
 def ideas():
-    idea_list = Idea.query.filter_by(access='public')
+    idea_list = Idea.query.filter_by(access='public').all()
+
     return render_template('user/ideas.html', ideas=idea_list, title='Ideas')
 
 
@@ -205,13 +220,32 @@ def delete_idea(idea):
     Idea.query.filter_by(id=idea, owner=owner).delete()
     db.session.commit()
     flash('Idea Removed!', 'danger')
-    return redirect(url_for("user.ideas"))
+    return redirect(url_for("user.my_ideas"))
 
 
 @user_blueprint.route('/user/<username>', methods=['GET', 'POST'])
 def user_profile(username):
     user = User.query.filter_by(user_name=username).first()
-    ideas = Idea.query.filter_by(owner=user.id).all()
+    team = Team.query.filter_by(owner=current_user.id, name="default").first()
+    team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+
+    idea_list = []
+
+    # if this user is you, then show all the ideas
+    if username == current_user.user_name:
+        idea_list.extend(Idea.query.filter_by(owner=user.id).all())
+    else:
+        # check list ideas if they're shared with you on your team + public ideas
+        for team_membership in team_memberships:
+            user = User.query.filter_by(user_name=username).first()
+            if user.id == team_membership.member_id:
+                idea_list.extend(db.session.query(Idea)
+                                 .filter(Idea.owner == user.id)
+                                 .filter(Idea.access != "private")
+                                 .all())
+            # otherwise just show the user's public ideas
+            else:
+                idea_list.extend(Idea.query.filter_by(owner=user.id, access="public").all())
 
     # team_member_ids = Team.get_team_member_ids(user.id)
     team = Team.query.filter_by(owner=user.id, name="default").first()
@@ -223,7 +257,8 @@ def user_profile(username):
         if membership.member_id != user.id:
             team_members.append(User.query.filter_by(id=membership.member_id).first())
 
-    return render_template('user/user_profile.html', user=user, ideas=ideas, team_members=team_members)
+    return render_template('user/user_profile.html', user=user, ideas=idea_list, team_members=team_members)
+
 
 @user_blueprint.route('/add_to_team/<username>', methods=['GET', 'POST'])
 @login_required

@@ -11,7 +11,7 @@
     </div>
     <br>
     <br>
-
+    {% if ideas | length > 0 %}
     {% for idea_row in ideas | slice(2) %}
     <div class="row">
         {% for idea in idea_row %}
@@ -28,6 +28,9 @@
         {% endfor %}
     </div>
     {% endfor %}
+    {% else %}
+    No ideas today.  Go make some!
+    {% endif %}
 
 {% endblock %}
 

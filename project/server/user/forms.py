@@ -58,7 +58,7 @@ class RegisterForm(FlaskForm):
 class IdeaForm(FlaskForm):
     title = StringField('Title')
     description = StringField('Description', widget=TextArea())
-    access = SelectField('Access', choices=[("public", "Public"), ("private", "Private")], default="private")
+    access = SelectField('Access', choices=[("public", "Public"), ("private", "Private"), ("team", "Team")], default="private")
 
 
 class ResetPasswordForm(FlaskForm):
