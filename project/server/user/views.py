@@ -10,7 +10,7 @@ from flask import render_template, Blueprint, url_for, \
 from flask_login import login_user, logout_user, login_required, current_user
 
 from project.server import bcrypt, db, app
-from project.server.models import User, Idea, Team, TeamMembership
+from project.server.models import User, Idea, Team, TeamMembership, VoteTracker
 from project.server.user.forms import LoginForm, RegisterForm, IdeaForm, ResetPasswordForm, UserProfileForm
 import boto3
 import sys
@@ -151,7 +151,19 @@ def ideas():
 @user_blueprint.route('/ideas/<idea>/', methods=['GET', 'POST'])
 def idea_detail(idea):
     idea_result = Idea.query.filter_by(id=idea).first()
-    return render_template('user/idea_detail.html', idea=idea_result)
+    vote_result = VoteTracker.query.filter_by(user_id=current_user.id, idea_id=idea).first()
+
+    up_disabled = "enabled"
+    down_disabled = "enabled"
+
+    if vote_result:
+        print("vote result: ", vote_result.vote)
+        if vote_result.vote == "up":
+            up_disabled = "disabled"
+        elif vote_result.vote == "down":
+            down_disabled = "disabled"
+
+    return render_template('user/idea_detail.html', idea=idea_result, up_disabled=up_disabled, down_disabled=down_disabled)
 
 
 @user_blueprint.route('/ideas/<idea>/edit', methods=['GET', 'POST'])
@@ -339,3 +351,42 @@ def save_picture(form_picture):
     picture_url = "https://s3.amazonaws.com/" + bucket + "/" + full_filename
     return picture_url
 
+
+@user_blueprint.route('/vote', methods=['GET', 'POST'])
+def vote():
+    print('request: ', request.json)
+
+    vote_result = request.json['vote']
+    idea_id = request.json['idea_id']
+    user_id = current_user.id
+    prev_record = None
+
+    vote_record = VoteTracker.query.filter_by(user_id=current_user.id, idea_id=idea_id).first()
+    if vote_record:
+        # if a prev record exists
+        prev_record = vote_record.vote
+        vote_record.vote = vote_result
+    else:
+        vote_record = VoteTracker(idea_id, user_id, vote_result)
+
+    db.session.add(vote_record)
+    db.session.commit()
+
+    idea = Idea.query.filter_by(id=idea_id).first()
+
+    if prev_record is not None:
+        if prev_record == "up":
+            idea.up_votes = idea.up_votes - 1
+            idea.down_votes = idea.down_votes + 1
+        elif prev_record == "down":
+            idea.up_votes = idea.up_votes + 1
+            idea.down_votes = idea.down_votes - 1
+    elif vote_result == "up":
+        idea.up_votes = idea.up_votes + 1
+    elif vote_result == "down":
+        idea.down_votes = idea.down_votes + 1
+
+    db.session.add(idea)
+    db.session.commit()
+
+    return jsonify({'up_votes': idea.up_votes, 'down_votes': idea.down_votes}), 200

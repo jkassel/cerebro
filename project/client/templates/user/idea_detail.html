@@ -25,6 +25,22 @@
     <h1>Description</h1>
     <p>{{ idea.description|safe }}</p>
 
+
+    <br><br>
+
+    <button name="voteUpBtn"
+            type="button"
+            id="voteUpBtn"
+            class="btn btn-lg btn-primary fa fa-thumbs-o-up {{ up_disabled }}"
+            data-loading-text=" ... ">
+        <span id="vote_list_up">{{ idea.up_votes }}</span></button>
+    <button name="voteDownBtn"
+            type="button"
+            id="voteDownBtn"
+            class="btn btn-lg btn-primary fa fa-thumbs-o-down {{ down_disabled }}"
+            data-loading-text=" ... ">
+        <span id="vote_list_down">{{ idea.down_votes }}</span></button>
+
     <br><br>
     {% if idea.owner == current_user.id %}
     <a class="btn btn-dark btn-lg ml-auto" href="{{ url_for('user.edit_idea', idea=idea.id) }}">
@@ -62,6 +78,84 @@
     </div>
 
 
+
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    <script type=text/javascript>
+        // refer to this for handling the voting buttons
+        // https://www.reddit.com/r/flask/comments/7u075s/afhow_to_have_dynamic_data_in_flask_templates/
+
+        $(function() {
+            var up_disabled = "{{ up_disabled }}";
+            var down_disabled = "{{ down_disabled }}";
+
+            if( up_disabled == "disabled" ) {
+                $('#voteUpBtn').prop('disabled', true);
+            } else {
+                $('#voteUpBtn').prop('disabled', false);
+            };
+
+            if( down_disabled == "disabled" ) {
+                $('#voteDownBtn').prop('disabled', true);
+            } else {
+                $('#voteDownBtn').prop('disabled', false);
+            };
+
+            $('#voteUpBtn').click(function () {
+                console.log('up button clicked')
+                var data = {
+                    vote: 'up',
+                    idea_id: {{ idea.id }}
+                };
+
+                $.ajax({
+                    url: '/vote',
+                    data: JSON.stringify(data),
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (response) {
+                        $('#voteUpBtn').prop('disabled', true);
+                        $('#voteDownBtn').prop('disabled', false);
+                        document.getElementById('vote_list_up').innerHTML = response.up_votes;
+                        document.getElementById('vote_list_down').innerHTML = response.down_votes;
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+            $('#voteDownBtn').click(function () {
+                console.log('down button clicked')
+                var data = {
+                    vote: 'down',
+                    idea_id: {{ idea.id }}
+                };
+
+                $.ajax({
+                    url: '/vote',
+                    data: JSON.stringify(data),
+                    type: 'POST',
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (response) {
+                        $('#voteDownBtn').prop('disabled', true);
+                        $('#voteUpBtn').prop('disabled', false);
+                        document.getElementById('vote_list_up').innerHTML = response.up_votes;
+                        document.getElementById('vote_list_down').innerHTML = response.down_votes;
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+        });
+
+    </script>
 
 {% endblock %}
 

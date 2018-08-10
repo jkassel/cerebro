@@ -149,6 +149,14 @@ def create_data():
     db.session.commit()
 
 
+@manager.command
+def refresh():
+    drop_db()
+    create_db()
+    create_users()
+    create_data()
+
+
 port = int(os.environ.get('PORT', 5000))
 manager.add_command("runserver", Server(
     use_debugger=True,

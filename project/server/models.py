@@ -97,7 +97,8 @@ class Idea(db.Model):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(1024), nullable=True)
     owner = db.Column(db.Integer, nullable=False)
-    rating = db.Column(db.Integer, nullable=True)
+    up_votes = db.Column(db.Integer, nullable=True)
+    down_votes = db.Column(db.Integer, nullable=True)
     created_date = db.Column(db.DateTime, nullable=False)
 
     # access types: public, private, team
@@ -107,7 +108,8 @@ class Idea(db.Model):
         self.owner = owner
         self.title = title
         self.description = description
-        self.rating = 0
+        self.up_votes = 0
+        self.down_votes = 0
         self.access = access
         self.created_date = datetime.datetime.now()
 
@@ -271,3 +273,20 @@ class TeamMembership(db.Model):
 
     def __repr__(self):
         return '<TeamMembership {0}'.format(self.id)
+
+
+class VoteTracker(db.Model):
+    __tablename__ = "vote_tracker"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    idea_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    vote = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, idea_id, user_id, vote):
+        self.idea_id = idea_id
+        self.user_id = user_id
+        self.vote = vote
+
+    def __repr__(self):
+        return '<UserVote {0}'.format(self.id)
