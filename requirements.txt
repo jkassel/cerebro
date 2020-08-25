@@ -29,4 +29,5 @@ WTForms
 psycopg2
 flask_ckeditor
 boto3
-Wand
+Wand<=6.9.9.9
+email_validator

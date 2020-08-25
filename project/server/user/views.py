@@ -130,13 +130,16 @@ def my_ideas():
 
 @user_blueprint.route('/team_ideas', methods=['GET', 'POST'])
 def team_ideas():
+    team = None
+    team_memberships = None
     team = Team.query.filter_by(owner=current_user.id, name="default").first()
-    team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+    if team:
+        team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
 
     idea_list = []
-    for membership in team_memberships:
-        idea_list.extend(Idea.query.filter_by(owner=membership.member_id, access="team").all())
-
+    if team_memberships:
+        for membership in team_memberships:
+            idea_list.extend(Idea.query.filter_by(owner=membership.member_id, access="team").all())
 
     return render_template('user/ideas.html', ideas=idea_list, title='Team Ideas')
 
@@ -237,17 +240,21 @@ def delete_idea(idea):
 
 @user_blueprint.route('/user/<username>', methods=['GET', 'POST'])
 def user_profile(username):
+    user = None
+    team = None
+    team_memberships = None
+
     user = User.query.filter_by(user_name=username).first()
     team = Team.query.filter_by(owner=current_user.id, name="default").first()
-    team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+    if team:
+        team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
 
     idea_list = []
 
     # if this user is you, then show all the ideas
     if username == current_user.user_name:
         idea_list.extend(Idea.query.filter_by(owner=user.id).all())
-    else:
-        # check list ideas if they're shared with you on your team + public ideas
+    elif team_memberships:
         for team_membership in team_memberships:
             user = User.query.filter_by(user_name=username).first()
             if user.id == team_membership.member_id:
@@ -260,14 +267,16 @@ def user_profile(username):
                 idea_list.extend(Idea.query.filter_by(owner=user.id, access="public").all())
 
     # team_member_ids = Team.get_team_member_ids(user.id)
-    team = Team.query.filter_by(owner=user.id, name="default").first()
-    team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+
+    #team = Team.query.filter_by(owner=user.id, name="default").first()
+    #team_memberships = TeamMembership.query.filter_by(team_id=team.id).all()
+
 
     team_members = []
-
-    for membership in team_memberships:
-        if membership.member_id != user.id:
-            team_members.append(User.query.filter_by(id=membership.member_id).first())
+    if team_memberships:
+        for membership in team_memberships:
+            if membership.member_id != user.id:
+                team_members.append(User.query.filter_by(id=membership.member_id).first())
 
     return render_template('user/user_profile.html', user=user, ideas=idea_list, team_members=team_members)
 
